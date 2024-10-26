@@ -1,0 +1,57 @@
+class Solution {
+public:
+    struct State {
+    int x, y, health;
+    State(int x, int y, int health) : x(x), y(y), health(health) {}
+};
+
+   
+    bool findSafeWalk(vector<vector<int>>& grid, int health) {
+         int m = grid.size();
+    int n = grid[0].size();
+
+    // Directions for moving up, down, left, right
+    vector<pair<int, int>> directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+    // BFS queue that holds states (x, y, remaining health)
+    queue<State> q;
+    q.push(State(0, 0, health));
+
+    // A 2D vector to track the maximum health left when visiting each cell
+    vector<vector<int>> visited(m, vector<int>(n, -1));
+    visited[0][0] = health;
+
+    while (!q.empty()) {
+        State current = q.front();
+        q.pop();
+
+        int x = current.x;
+        int y = current.y;
+        int health = current.health;
+
+        // If we've reached the bottom-right corner and health is 1 or more
+        if (x == m - 1 && y == n - 1 && health >= 1) {
+            return true;
+        }
+
+        // Explore all adjacent cells
+        for (auto& dir : directions) {
+            int newX = x + dir.first;
+            int newY = y + dir.second;
+            
+            // Check if the new position is within bounds
+            if (newX >= 0 && newX < m && newY >= 0 && newY < n) {
+                int newHealth = health - (grid[newX][newY] == 1 ? 1 : 0);
+
+                // Continue if the new health is positive and it's better than the previously visited health
+                if (newHealth > 0 && newHealth > visited[newX][newY]) {
+                    visited[newX][newY] = newHealth;
+                    q.push(State(newX, newY, newHealth));
+                }
+            }
+        }
+    }
+
+    return false; 
+    }
+};
